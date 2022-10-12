@@ -1,4 +1,4 @@
-﻿// The program shows the second digit of 3-digit-number
+﻿// The program shows the 3d digit of number
 
 using System;
 class Program
@@ -9,23 +9,14 @@ class Program
         int res;
         string input;
         bool is_number = false;
-        bool is_3d_number = false;
         do
         {
-            Console.WriteLine(String.Format("Enter 3 digit number: {0} = ", VarName));
+            Console.WriteLine(String.Format("Enter number: {0} = ", VarName));
             input = Console.ReadLine();
             
             is_number = int.TryParse(input, out res);
-            
-            is_3d_number = false;
-            if (is_number) {
-                 is_3d_number = TestNumber_3c(res);
-            }
-
-            if (!is_3d_number) {
-                Console.WriteLine(String.Format("The number {0} is not 3 digit", res));
-            }
-        } while (!is_number ||  !is_3d_number);
+          
+        } while (!is_number);
 
         return res;
     }
@@ -39,21 +30,50 @@ class Program
         }
     }
 
-    public int[] ConvertNumberToArrayOfDigit(int num)
+    public List<int> ConvertNumberToArrayOfDigit(int num)
     {
         int Size = 3;
-        int[] DigitOfNumber = new int[Size];
+        List<int> DigitOfNumber = new List<int>();
         int Rest = 0;
         int LastNumber = num;
         int Base = 10;
-        for (int i = 0; i < Size; i++)
+        while(LastNumber != 0)
         {
             Rest = LastNumber % Base;
-            DigitOfNumber[i] = Rest;
+            DigitOfNumber.Add(Rest);
             LastNumber = (LastNumber - Rest) / Base;
         }
         return DigitOfNumber;
     }
+    public void PrintNumberInDecimalNotation(int Number, List<int> NumberInDecimalNotation)
+    {
+        string Result = GetStringToPrintNumberInDecimalNotation(NumberInDecimalNotation);
+        Console.WriteLine(String.Format("{0} = {1}", Number, Result));
+    }
+
+    public string GetStringToPrintNumberInDecimalNotation(List<int> NumberInDecimalNotation)
+    {
+        string Result = "";
+        bool is_first_row = true;
+        int MaxPower = 0;
+        foreach(int digit in NumberInDecimalNotation) {
+            
+            if(is_first_row) {
+                Result = Result + String.Format("{0}", digit, MaxPower);
+                is_first_row = false;
+                MaxPower = MaxPower + 1;
+                continue;
+            }
+            string text_format = "{0}*10^{1} + ";
+            if (MaxPower == 1) {
+                text_format = "{0}*10 + ";
+            }
+            Result = String.Format(text_format, digit, MaxPower) + Result;
+            MaxPower = MaxPower + 1;
+        }
+        return Result;
+    }
+
     public static void Main(string[] args)
     {
         Program pr = new Program(); // Creating a class Object  
@@ -61,8 +81,15 @@ class Program
 
         string VarName_N = "N";
         int N = pr.GetNumber(VarName_N);
-        int[] DigintOfNumber = pr.ConvertNumberToArrayOfDigit(N);
-        Console.WriteLine(String.Format("Num = {0}*10^2 + {1}*10 + {2}", DigintOfNumber[2], DigintOfNumber[1], DigintOfNumber[0]));
-        Console.WriteLine(String.Format("Second digit of number is {0} ", DigintOfNumber[1]));
+        List<int> DigintOfNumber = pr.ConvertNumberToArrayOfDigit(N);
+        
+        pr.PrintNumberInDecimalNotation(N, DigintOfNumber);
+        int CountDigits = DigintOfNumber.Count();
+        if (CountDigits < 3) {
+            Console.WriteLine("The 3d digit does not exists!");
+        } else {
+            Console.WriteLine(String.Format("The 3d digit is {0} ", DigintOfNumber[CountDigits - 3]));
+        }
+        
     }
 }
